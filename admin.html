@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Italiana&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #07020a;
+      color: #f0e0e4;
+      font-family: 'Cormorant Garamond', serif;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .login-wrap, .dashboard { width: 100%; max-width: 340px; }
+
+    /* ── LOGIN ── */
+    .login-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 1.4rem;
+      padding: 3rem 2.5rem;
+      background: rgba(60,5,15,.3);
+      border: 1px solid rgba(200,80,100,.22);
+      border-radius: 22px;
+      backdrop-filter: blur(18px);
+      text-align: center;
+    }
+    .login-wrap h1 {
+      font-family: 'Italiana', serif;
+      font-size: 2.6rem; font-weight: 400;
+      background: linear-gradient(160deg, #fff 0%, #f0b0be 45%, #c0304a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .login-wrap p { font-size: .82rem; color: #8a5060; letter-spacing: .1em; }
+
+    .pin-input {
+      width: 100%;
+      background: rgba(80,10,25,.35);
+      border: 1px solid rgba(200,80,100,.22);
+      border-radius: 11px;
+      padding: .8rem 1.2rem;
+      color: #f0e0e4;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; letter-spacing: .3em;
+      text-align: center; outline: none;
+      transition: border-color .25s;
+    }
+    .pin-input:focus { border-color: rgba(200,70,90,.5); }
+    .pin-input::placeholder { color: #5a2535; letter-spacing: .1em; font-size: .9rem; }
+
+    .login-btn {
+      width: 100%;
+      background: rgba(140,20,40,.5);
+      border: 1px solid rgba(200,70,90,.35);
+      border-radius: 11px;
+      padding: .8rem;
+      color: #f0c0c8;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: .95rem; letter-spacing: .12em;
+      cursor: pointer;
+      transition: background .25s, color .2s;
+    }
+    .login-btn:hover { background: rgba(180,30,55,.6); color: #fff; }
+
+    .err { font-size: .78rem; color: #c03050; letter-spacing: .08em; display: none; }
+
+    /* ── DASHBOARD ── */
+    .dashboard { display: none; flex-direction: column; gap: 1.2rem; }
+
+    .dash-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 1.5rem;
+      background: rgba(60,5,15,.3);
+      border: 1px solid rgba(200,80,100,.2);
+      border-radius: 16px;
+      backdrop-filter: blur(18px);
+    }
+    .dash-header h2 {
+      font-family: 'Italiana', serif;
+      font-size: 1.8rem; font-weight: 400;
+      background: linear-gradient(160deg, #fff 0%, #f0b0be 50%, #c0304a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .count-badge {
+      background: rgba(140,20,40,.5);
+      border: 1px solid rgba(200,70,90,.3);
+      border-radius: 999px;
+      padding: .3rem .9rem;
+      font-size: .78rem; color: #f0c0c8; letter-spacing: .1em;
+    }
+
+    .empty {
+      text-align: center; padding: 2.5rem;
+      color: #5a2535; font-size: .9rem; letter-spacing: .1em;
+      background: rgba(60,5,15,.2);
+      border: 1px solid rgba(200,80,100,.1);
+      border-radius: 16px;
+    }
+
+    .req-card {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.3rem;
+      background: rgba(60,5,15,.3);
+      border: 1px solid rgba(200,80,100,.2);
+      border-radius: 14px;
+      backdrop-filter: blur(12px);
+      animation: fadeIn .4s ease;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+    .req-info { display: flex; flex-direction: column; gap: .25rem; }
+    .req-num {
+      font-size: 1.05rem; font-weight: 600;
+      color: #f0d0d5; letter-spacing: .06em;
+    }
+    .req-time {
+      font-size: .7rem; color: #6a3040; letter-spacing: .1em;
+    }
+
+    .del-btn {
+      background: none; border: none;
+      color: #5a2535; font-size: 1rem; cursor: pointer;
+      padding: .3rem .5rem; border-radius: 8px;
+      transition: color .2s, background .2s;
+    }
+    .del-btn:hover { color: #c03050; background: rgba(192,48,80,.1); }
+
+    .clear-btn {
+      width: 100%;
+      background: rgba(80,5,15,.3);
+      border: 1px solid rgba(180,40,60,.18);
+      border-radius: 11px;
+      padding: .7rem;
+      color: #7a3040; font-family: 'Cormorant Garamond', serif;
+      font-size: .82rem; letter-spacing: .14em; text-transform: uppercase;
+      cursor: pointer; transition: color .2s, border-color .2s;
+    }
+    .clear-btn:hover { color: #c03050; border-color: rgba(192,48,80,.35); }
+
+    .logout-btn {
+      width: 100%; background: none;
+      border: 1px solid rgba(200,80,100,.12);
+      border-radius: 11px; padding: .65rem;
+      color: #5a2535; font-family: 'Cormorant Garamond', serif;
+      font-size: .78rem; letter-spacing: .16em; text-transform: uppercase;
+      cursor: pointer; transition: color .2s;
+    }
+    .logout-btn:hover { color: #a06070; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <h1>aMir</h1>
+  <p>admin access only</p>
+  <input class="pin-input" id="pinInput" type="password" placeholder="enter pin" maxlength="10">
+  <button class="login-btn" onclick="doLogin()">enter</button>
+  <p class="err" id="errMsg">wrong pin</p>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="dash-header">
+    <h2>requests</h2>
+    <span class="count-badge" id="countBadge">0</span>
+  </div>
+  <div id="listWrap"></div>
+  <button class="clear-btn" onclick="clearAll()">clear all</button>
+  <button class="logout-btn" onclick="doLogout()">logout</button>
+</div>
+
+<script>
+  // ── PIN — غيره لرقم سري تختاره أنت ──
+  const PIN = '29572010';
+
+  function doLogin() {
+    const val = document.getElementById('pinInput').value;
+    if (val === PIN) {
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'flex';
+      loadRequests();
+    } else {
+      document.getElementById('errMsg').style.display = 'block';
+      document.getElementById('pinInput').value = '';
+    }
+  }
+
+  document.getElementById('pinInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function loadRequests() {
+    const data = JSON.parse(localStorage.getItem('phoneRequests') || '[]');
+    const wrap = document.getElementById('listWrap');
+    const badge = document.getElementById('countBadge');
+    badge.textContent = data.length;
+    wrap.innerHTML = '';
+
+    if (!data.length) {
+      wrap.innerHTML = '<div class="empty">no requests yet</div>';
+      return;
+    }
+
+    // newest first
+    [...data].reverse().forEach((item, i) => {
+      const realIndex = data.length - 1 - i;
+      const d = new Date(item.time);
+      const timeStr = d.toLocaleDateString('en-GB') + ' · ' + d.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+      const card = document.createElement('div');
+      card.className = 'req-card';
+      card.innerHTML = `
+        <div class="req-info">
+          <span class="req-num">${item.number}</span>
+          <span class="req-time">${timeStr}</span>
+        </div>
+        <button class="del-btn" onclick="deleteOne(${realIndex})">✕</button>
+      `;
+      wrap.appendChild(card);
+    });
+  }
+
+  function deleteOne(index) {
+    const data = JSON.parse(localStorage.getItem('phoneRequests') || '[]');
+    data.splice(index, 1);
+    localStorage.setItem('phoneRequests', JSON.stringify(data));
+    loadRequests();
+  }
+
+  function clearAll() {
+    if (confirm('Clear all requests?')) {
+      localStorage.removeItem('phoneRequests');
+      loadRequests();
+    }
+  }
+
+  function doLogout() {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('loginWrap').style.display = 'flex';
+    document.getElementById('pinInput').value = '';
+  }
+</script>
+</body>
+</html>
