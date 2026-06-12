@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>aMir</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Italiana&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #07020a;
+      color: #f0e0e4;
+      font-family: 'Cormorant Garamond', serif;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem 1rem;
+    }
+    canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
+    .orb1 { width: 340px; height: 340px; background: radial-gradient(circle, rgba(90,5,20,.55), transparent 70%); top: -80px; left: -80px; animation: drift1 12s ease-in-out infinite; }
+    .orb2 { width: 260px; height: 260px; background: radial-gradient(circle, rgba(120,10,35,.4), transparent 70%); bottom: -60px; right: -60px; animation: drift2 15s ease-in-out infinite; }
+    @keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,20px)} }
+    @keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-25px,-18px)} }
+
+    .card {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 1.5rem;
+      padding: 3.5rem 3rem;
+      background: rgba(60,5,15,.3);
+      border: 1px solid rgba(200,80,100,.25);
+      border-radius: 24px;
+      backdrop-filter: blur(18px);
+      text-align: center;
+      max-width: 340px; width: 100%;
+      animation: fadeIn 1.2s ease forwards;
+    }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+    h1 {
+      font-family: 'Italiana', serif;
+      font-size: 4rem; font-weight: 400;
+      letter-spacing: .06em; line-height: 1;
+      background: linear-gradient(160deg, #ffffff 0%, #f0b0be 45%, #c0304a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: shimmer 6s ease-in-out infinite alternate;
+    }
+    @keyframes shimmer {
+      from { filter: drop-shadow(0 0 8px rgba(200,60,80,.3)); }
+      to   { filter: drop-shadow(0 0 22px rgba(200,60,80,.65)); }
+    }
+
+    .info { font-size: 1rem; font-weight: 400; letter-spacing: .14em; color: #d0a0aa; }
+
+    .divider { width: 36px; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,80,100,.45), transparent); }
+
+    .links { display: flex; flex-direction: column; gap: .65rem; width: 100%; }
+
+    a.link {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .8rem 1.2rem;
+      background: rgba(80,10,25,.35);
+      border: 1px solid rgba(200,80,100,.22);
+      border-radius: 11px;
+      text-decoration: none; color: #f0c0c8;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: .95rem; font-weight: 600; letter-spacing: .1em;
+      transition: background .25s, border-color .25s, color .25s, transform .2s;
+    }
+    a.link:hover { background: rgba(120,20,40,.45); border-color: rgba(220,90,110,.45); color: #fff; transform: translateX(-3px); }
+    a.link .plat { color: #b07880; font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; font-weight: 400; transition: color .25s; }
+    a.link:hover .plat { color: #e0a0a8; }
+    .arr { font-size: .65rem; opacity: .4; transition: opacity .2s, transform .2s; }
+    a.link:hover .arr { opacity: 1; transform: translateX(-3px); }
+
+    .req-wrap { width: 100%; }
+    .req-label { display: block; font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; color: #a07080; margin-bottom: .75rem; }
+    .req-row { display: flex; gap: .5rem; }
+    .req-input {
+      flex: 1; background: rgba(80,10,25,.3); border: 1px solid rgba(180,60,80,.2);
+      border-radius: 10px; padding: .72rem 1rem; color: #f0e0e4;
+      font-family: 'Cormorant Garamond', serif; font-size: .95rem; letter-spacing: .06em;
+      outline: none; transition: border-color .25s, background .25s;
+    }
+    .req-input::placeholder { color: #6a3040; }
+    .req-input:focus { border-color: rgba(200,70,90,.5); background: rgba(100,15,30,.35); }
+    .req-btn {
+      background: rgba(140,20,40,.5); border: 1px solid rgba(200,70,90,.35);
+      border-radius: 10px; padding: .72rem 1.1rem; color: #f0c0c8;
+      font-family: 'Cormorant Garamond', serif; font-size: .9rem; letter-spacing: .08em;
+      cursor: pointer; transition: background .25s, color .25s, transform .15s; white-space: nowrap;
+    }
+    .req-btn:hover { background: rgba(180,30,55,.6); color: #fff; transform: scale(1.03); }
+    .req-btn:active { transform: scale(.97); }
+    .req-success { display: none; font-size: .82rem; letter-spacing: .1em; color: #c07880; margin-top: .6rem; animation: fadeIn .5s ease; }
+
+    .live { display: flex; align-items: center; gap: .5rem; font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: #a07080; }
+    .pulse { width: 6px; height: 6px; border-radius: 50%; background: #c03050; animation: beat 2s ease-in-out infinite; }
+    @keyframes beat { 0%{box-shadow:0 0 0 0 rgba(192,48,80,.6)} 60%{box-shadow:0 0 0 7px rgba(192,48,80,0)} 100%{box-shadow:0 0 0 0 rgba(192,48,80,0)} }
+  </style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="card">
+  <h1>aMir</h1>
+  <div class="info">16 · Doha, Qatar</div>
+  <div class="divider"></div>
+
+  <div class="links">
+    <a class="link" href="https://instagram.com/emirawy" target="_blank" rel="noopener">
+      <span class="arr">←</span><span>@emirawy</span><span class="plat">Instagram</span>
+    </a>
+    <a class="link" href="https://tiktok.com/@emirawy0" target="_blank" rel="noopener">
+      <span class="arr">←</span><span>@emirawy0</span><span class="plat">TikTok</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="req-wrap">
+    <span class="req-label">request phone number</span>
+    <div class="req-row">
+      <input class="req-input" id="phoneInput" type="tel" placeholder="+974 XXXX XXXX" maxlength="20">
+      <button class="req-btn" id="reqBtn" onclick="submitPhone()">send</button>
+    </div>
+    <p class="req-success" id="reqSuccess">received ✦</p>
+  </div>
+
+  <div class="live"><div class="pulse"></div>active</div>
+</div>
+
+<script>
+// particles
+(function(){
+  const c=document.getElementById('bg'),ctx=c.getContext('2d');let P=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  addEventListener('resize',resize);resize();
+  for(let i=0;i<80;i++)P.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*.7+.15,a:Math.random()*.4,da:(Math.random()-.5)*.004,dx:(Math.random()-.5)*.07,dy:(Math.random()-.5)*.07});
+  (function draw(){ctx.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.a+=p.da;if(p.a<=0||p.a>=.4)p.da*=-1;p.x+=p.dx;p.y+=p.dy;if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,60,80,${p.a})`;ctx.fill();});requestAnimationFrame(draw);})();
+})();
+
+const BOT_TOKEN = '8863148650:AAF4t455BdXcHSk-mSiv9qz145vZknlYlf8';
+const CHAT_ID   = '1444438284';
+
+async function submitPhone() {
+  const input = document.getElementById('phoneInput');
+  const success = document.getElementById('reqSuccess');
+  const btn = document.getElementById('reqBtn');
+  const num = input.value.trim();
+  if (!num) { input.focus(); return; }
+
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: `📱 New request\n\nNumber: ${num}\nTime: ${new Date().toLocaleString('en-GB')}`
+      })
+    });
+  } catch(e) {}
+
+  input.value = '';
+  btn.textContent = '✦';
+  btn.disabled = false;
+  success.style.display = 'block';
+  setTimeout(() => { btn.textContent = 'send'; success.style.display = 'none'; }, 3000);
+}
+
+document.getElementById('phoneInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitPhone();
+});
+</script>
+</body>
+</html>
